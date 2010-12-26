@@ -1,0 +1,4 @@
+*.swp
+*.vba
+tags
+/build

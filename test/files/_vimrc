@@ -1,0 +1,5 @@
+let s:testvar = 1
+
+nmap <c-c> :TestLookupCommand
+
+echo s:testvar

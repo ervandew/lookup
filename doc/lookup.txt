@@ -1,0 +1,68 @@
+*lookup.txt*
+
+-----------------------------------------------------------------------------
+Lookup                                           *lookup*
+
+  Overview                           |lookup-overview|
+  Usage                              |lookup-usage|
+  Configuration                      |lookup-configuration|
+
+-----------------------------------------------------------------------------
+Overview                                         *lookup-overview*
+
+Lookup is a vim plugin for vim script developers which allows you to quickly
+find command/function/variable definitions/references or lookup vim docs for
+the element under the cursor.
+
+-----------------------------------------------------------------------------
+Usage                                            *lookup-usage* *:Lookup*
+
+To use Lookup, simply place the cursor on the element you want to find and
+run the :Lookup command.  If you are on the name of a command, function, or
+variable definition then Lookup will find all the references and populate the
+quickfix list with the results.  If you are on a reference of a command,
+function, or variable, then Lookup will find the definition(s). If you are on
+a vim builtin command, variable, expression, etc. then in most cases Lookup
+will open the help topic for that element.
+
+Note: Lookup relies on vim syntax highlighting to help determine context and
+the type of element to lookup, so some lookups won't return any results if
+syntax is disabled.
+
+The process of locating results for your :Lookup request involves:
+1. Determining the context of the element under the cursor and building an
+   appropriate search pattern.
+2. Determining the path(s) to search. If |g:LocateRuntimePath| is set to 'all',
+   then each path in your |'runtimepath'| will be searched. However, if
+   |g:LocateRuntimePath| is set to 'relative', the default, then the path to
+   search is determined by walking up the directory structure starting at the
+   current file's directory until a standard vim directory is found (plugin,
+   ftplugin, etc.). For vimrc files, the vimrc file and either the .vim or
+   vimfiles sibling directory will be searched.
+3. Once the paths to search have been determined, Lookup will then create a
+   new quickfix list and issue a |:vimgrepadd| on each path for the search
+   pattern built in step #1.
+
+Instead of typing the :Lookup command, you're encouraged to map it to the key
+sequence of your choice inside an ftplugin file (ftplugin/vim/<foo>.vim,
+ftplugin/<bar>_vim.vim). Below is an example which maps <cr> to :Lookup. The
+surrounding if statement prevents <cr> from being mapped when in vim's
+|command-line-window| (the regex may need to be updated for your locale): >
+
+  if bufname('%') !~ '^\(command-line\|\[Command Line\]\)$'
+    nnoremap <silent> <buffer> <cr> :Lookup<cr>
+  endif
+>
+
+-----------------------------------------------------------------------------
+Configuration                                    *lookup-configuration*
+
+- *g:LocateRuntimePath* (Default: 'relative')
+  Specifies whether all paths in your runtime path will be search or just the
+  path which the current file resides in. Possible values include 'all' or
+  'relative'.
+- *g:LocateSingleResultAction* (Default: 'edit')
+  Specifies what action to take when a single result is found. Possible values
+  include 'split', 'edit', or 'copen'.
+
+vim:tw=78:ft=help:norl:
