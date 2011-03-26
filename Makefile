@@ -16,5 +16,10 @@ all:
 		fi
 	@rm $(TEMP)
 
+dist:
+	@rm lookup.vba 2> /dev/null || true
+	@vim -c 'r! git ls-files autoload doc ftplugin' \
+		-c '$$,$$d _' -c '%MkVimball lookup.vba .' -c 'q!'
+
 clean:
 	@rm -R build 2> /dev/null || true
