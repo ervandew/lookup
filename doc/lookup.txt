@@ -32,9 +32,9 @@ syntax is disabled.
 The process of locating results for your :Lookup request involves:
 1. Determining the context of the element under the cursor and building an
    appropriate search pattern.
-2. Determining the path(s) to search. If |g:LocateRuntimePath| is set to 'all',
+2. Determining the path(s) to search. If |g:LookupRuntimePath| is set to 'all',
    then each path in your |'runtimepath'| will be searched. However, if
-   |g:LocateRuntimePath| is set to 'relative', the default, then the path to
+   |g:LookupRuntimePath| is set to 'relative', the default, then the path to
    search is determined by walking up the directory structure starting at the
    current file's directory until a standard vim directory is found (plugin,
    ftplugin, etc.). For vimrc files, the vimrc file and either the .vim or
@@ -57,11 +57,11 @@ surrounding if statement prevents <cr> from being mapped when in vim's
 -----------------------------------------------------------------------------
 Configuration                                    *lookup-configuration*
 
-- *g:LocateRuntimePath* (Default: 'relative')
+- *g:LookupRuntimePath* (Default: 'relative')
   Specifies whether all paths in your runtime path will be search or just the
   path which the current file resides in. Possible values include 'all' or
   'relative'.
-- *g:LocateSingleResultAction* (Default: 'edit')
+- *g:LookupSingleResultAction* (Default: 'edit')
   Specifies what action to take when a single result is found. Possible values
   include 'split', 'edit', or 'copen'.
 

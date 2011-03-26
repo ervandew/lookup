@@ -36,13 +36,13 @@
 " }}}
 
 " Global Variables {{{
-if !exists("g:LocateRuntimePath")
+if !exists("g:LookupRuntimePath")
   " possible values ('all', 'relative')
-  let g:LocateRuntimePath = 'relative'
+  let g:LookupRuntimePath = 'relative'
 endif
-if !exists("g:LocateSingleResultAction")
+if !exists("g:LookupSingleResultAction")
   " possible values ('split', 'edit', 'copen')
-  let g:LocateSingleResultAction = 'edit'
+  let g:LookupSingleResultAction = 'edit'
 endif
 " }}}
 
@@ -226,12 +226,12 @@ function! s:Find(element, bang, context) " {{{
     if a:bang != ''
       copen
     elseif len(qflist) == 1
-      if g:LocateSingleResultAction == 'edit'
+      if g:LookupSingleResultAction == 'edit'
         cfirst
         if foldclosed(line('.')) != -1
           foldopen!
         endif
-      elseif g:LocateSingleResultAction == 'split'
+      elseif g:LookupSingleResultAction == 'split'
         let file = bufname(qflist[0].bufnr)
         if file != expand('%')
           silent exec "split " . file
@@ -261,7 +261,7 @@ function! s:Find(element, bang, context) " {{{
 endfunction " }}}
 
 function! s:Paths() " {{{
-  if g:LocateRuntimePath == 'relative'
+  if g:LookupRuntimePath == 'relative'
     let file = expand('%:t')
     let path = expand('%:p:h')
 
