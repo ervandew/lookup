@@ -234,7 +234,12 @@ function! s:Find(element, bang, context) " {{{
       elseif g:LookupSingleResultAction == 'split'
         let file = bufname(qflist[0].bufnr)
         if file != expand('%')
-          silent exec "split " . file
+          let winnr = bufwinnr(bufnr('^' . file))
+          if winnr != -1
+            exec winnr . 'winc w'
+          else
+            silent exec 'split ' . escape(file, ' ')
+          endif
         endif
         call cursor(qflist[0].lnum, qflist[0].col)
         if foldclosed(line('.')) != -1
