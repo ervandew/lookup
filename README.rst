@@ -38,14 +38,18 @@ element.
 
 While editing a vim file, you can lookup the element under the cursor using:
 
+::
+
     :Lookup
 
 You can also map this command so that you simply need to hit <cr> on an element
 to look it up by adding the following to a ftplugin/vim_lookup.vim file in your
 vimfiles directory (%HOME%/vimfiles on Windows, ~/.vim on Linux/OSX):
 
-    if bufname('%') !~ '^\(command-line\|\[Command Line\]\)$'
-        nnoremap <silent> <buffer> <cr> :Lookup<cr>
-    endif
+::
+
+  if bufname('%') !~ '^\(command-line\|\[Command Line\]\)$'
+    nnoremap <silent> <buffer> <cr> :Lookup<cr>
+  endif
 
 For more details please see the lookup vim docs (:help lookup).
