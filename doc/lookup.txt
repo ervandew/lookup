@@ -4,6 +4,7 @@
 Lookup                                           *lookup*
 
   Overview                           |lookup-overview|
+  Prerequisites                      |lookup-prerequisites|
   Usage                              |lookup-usage|
   Configuration                      |lookup-configuration|
 
@@ -13,6 +14,13 @@ Overview                                         *lookup-overview*
 Lookup is a vim plugin for vim script developers which allows you to quickly
 find command/function/variable definitions/references or lookup vim docs for
 the element under the cursor.
+
+-----------------------------------------------------------------------------
+Prerequisites                                    *lookup-prerequisites*
+
+Lookup is only enabled for files of file type 'vim' and requires that you have
+file type plugins enabled (|:filetype-plugin-on|), as well as syntax
+highlighting turned on (|:syntax-enable|).
 
 -----------------------------------------------------------------------------
 Usage                                            *lookup-usage* *:Lookup*
