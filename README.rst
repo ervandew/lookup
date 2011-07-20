@@ -31,9 +31,9 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Lookup is a plugin for vim script developers which provides funtionality to
+Lookup is a plugin for vim script developers which provides functionality to
 quickly and easily lookup docs for vim elements, or in the case of user defined
-functions, commands, or variables, find the definition or occurances of the
+functions, commands, or variables, find the definition or occurrences of the
 element.
 
 While editing a vim file, you can lookup the element under the cursor using:
