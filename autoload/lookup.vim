@@ -1,7 +1,7 @@
 " Author:  Eric Van Dewoestine
 "
 " License: {{{
-"   Copyright (c) 2005 - 2011, Eric Van Dewoestine
+"   Copyright (c) 2005 - 2012, Eric Van Dewoestine
 "   All rights reserved.
 "
 "   Redistribution and use of this software in source and binary forms, with
@@ -282,7 +282,7 @@ function! s:Paths() " {{{
     let path = expand('%:p:h')
 
     " for vimrc files, look for relative .vim or vimfiles directory
-    if file =~ '^[._]g\?vimrc$'
+    if file =~ '^[._]g\?vimrc'
       if isdirectory(path . '/.vim')
         return [expand('%:p'), path . '/.vim']
       elseif isdirectory(path . '/vimfiles')
