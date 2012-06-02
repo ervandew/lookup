@@ -62,6 +62,19 @@ surrounding if statement prevents <cr> from being mapped when in vim's
   endif
 >
 
+The :Lookup command can also be invoked with an argument which can be either a
+command name (with the leading ':'), variable name (with the leading scope:
+'g:', 'b:', etc), or function name and will search for the definition of that
+element.
+
+Ex: >
+
+  :Lookup :MyCommand
+  :Lookup g:MyVar
+  :Lookup MyFunction
+  :Lookup foo#MyFunction
+>
+
 -----------------------------------------------------------------------------
 Configuration                                    *lookup-configuration*
 

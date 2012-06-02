@@ -38,7 +38,7 @@
 " Command Declarations {{{
 
 if !exists(":Lookup") && bufname('%') !~ '^\(command-line\|\[Command Line\]\)$'
-  command -buffer -bang -nargs=0 Lookup :call lookup#Lookup('<bang>')
+  command -buffer -bang -nargs=? Lookup :call lookup#Lookup('<bang>', '<args>')
 endif
 
 " }}}
