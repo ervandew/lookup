@@ -75,48 +75,73 @@ endif
       \ 'cmd_def': '1',
       \ 'func_def': '1',
     \ }
-
-  let s:syntax_to_help = {
-      \ 'vimAutoCmd': 'autocmd',
-      \ 'vimAutoEvent': '<element>',
-      \ 'vimAutoGroupKey': 'augroup',
-      \ 'vimCommand': ':<element>',
-      \ 'vimFuncKey': ':<element>',
-      \ 'vimFuncName': '<element>()',
-      \ 'vimGroup': 'hl-<element>',
-      \ 'vimHLGroup': 'hl-<element>',
-      \ 'vimLet': ':<element>',
-      \ 'vimMap': ':<element>',
-      \ 'vimMapModKey': ':map-<<element>>',
-      \ 'vimNotFunc': ':<element>',
-      \ 'vimOper': 'expr-<element>',
-      \ 'vimOption': "'<element>'",
-      \ 'vimUserAttrbCmplt': ':command-completion-<element>',
-      \ 'vimUserAttrbKey': ':command-<element>',
-      \ 'vimUserCommand': ':<element>',
-    \ }
 " }}}
 
 function! lookup#Lookup(bang, element) " {{{
-  let line = ''
-  let syntax = ''
-  let type = ''
-
   let element = a:element
+  let line = getline('.')
   if element == ''
-    let line = getline('.')
-    let syntax = synIDattr(synID(line('.'), col('.'), 1), 'name')
-    let element = substitute(
-      \ line, '.\{-}\(\(<[a-zA-Z]\+>\)\?[[:alnum:]_:#]*' .
-      \ '\%' . col('.') . 'c[[:alnum:]_:#]*\).*', '\1', '')
+    if &ft == 'help'
+      let synid = synID(line('.'), col('.'), 1)
+      if has('nvim') && synid == 0
+        let link = luaeval(
+          \ 'vim.treesitter.get_node():parent():type()'
+        \ ) == 'taglink'
+      else
+        let link = synIDattr(synid, "name") == 'helpHyperTextJump'
+      endif
+
+      if link
+        let element = substitute(
+          \ line,
+          \ '.\{-}|\(.\{-}\%' . col('.') . 'c.\{-}\)|.*',
+          \ '\1',
+          \ ''
+        \)
+        if element == line
+          let element = ''
+        endif
+      endif
+    endif
+    if element == ''
+      let element = substitute(
+        \ line, '.\{-}\(\(<[a-zA-Z]\+>\)\?[[:alnum:]_:#.&]*' .
+        \ '\%' . col('.') . 'c[[:alnum:]_:#.&]*(\?\).*', '\1', '')
+    endif
   endif
+
+  if element =~ '^&' " option reference
+    let element = "'" . element[1:] . "'"
+  elseif element =~ '^vim\.g\.'
+    let element = substitute(element, 'vim\.g\.', 'g:', '')
+  elseif element =~ '^vim.[bgw]\?o\(pt\)\?\(_local\|_global\)\?\.' " option reference (in lua)
+    let element = substitute(element, '.*\.', '', '')
+    let element = substitute(element, ':.*', '', '')
+    let element = "'" . element . "'"
+  elseif element =~ '^vim\.api\.'
+    let element = element[8:]
+  elseif element =~ '^vim\.fn\.'
+    let element = element[7:]
+  elseif element =~ '^vim\.uv\.'
+    let element = element[4:]
+  endif
+
+  let help_entries = getcompletion(element, 'help')
+  call filter(help_entries, 'v:val =~ "^[:'']\\?' . element . '\\w*\\W*$"')
+
+  if len(help_entries)
+    exec 'help ' . element
+    return
+  endif
+
+  let type = ''
 
   if element =~? '^<sid>'
     let element = 's:' . element[5:]
   endif
 
-  " on a variable
-  if element =~ '^[bgsl]:\w\+$'
+  " on a variable or script scoped function
+  if element =~ '^[bgsl]:\w\+(\?$'
     let type = 'var'
 
     " edge case for script scoped function
@@ -126,14 +151,13 @@ function! lookup#Lookup(bang, element) " {{{
     endif
 
   " on a function
-  elseif element =~ '^[[:alnum:]#_]\+$' &&
+  elseif element =~ '^[[:alnum:]#_]\+(\?$' &&
        \ (element =~ '^[A-Z]' || element =~ '[#]') &&
        \ (line == '' || line =~ '[[:alnum:]_#]*\%' . col('.') . 'c[[:alnum:]_#]*\s*(')
     let type = 'func'
 
   " on a command ref
-  elseif element =~ '^:[A-Z]\w*$' ||
-       \ (element =~ '^[A-Z]\w*$' && syntax == 'vimUserCmdName')
+  elseif element =~ '^:[A-Z]\w*$'
     let type = 'cmd'
     if element =~ '^:'
       let element = element[1:]
@@ -142,40 +166,13 @@ function! lookup#Lookup(bang, element) " {{{
   " on an augroup name
   elseif line =~ 'aug\(r\|ro\|rou\|roup\)\?!\?\s\+\w*\%' . col('.') . 'c\w*'
     let type = 'aug'
-
-  " doc lookup
-  elseif a:element == ''
-    let char = line[col('.') - 1]
-    if element == '' && char =~ '\W' && char !~ '\s'
-      let element = substitute(line, '.\{-}\(\W*\%' . col('.') . 'c\W*\).*', '\1', '')
-      let element = substitute(element, '\(^.\{-}\s\+\|\s\+.\{-}$\)', '', 'g')
-    endif
-
-    let help = get(s:syntax_to_help, syntax, '')
-    if help == ''
-      let base = synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
-      if base == 'Statement'
-        let help = ':<element>'
-      endif
-
-      " vim variables
-      if element =~ '^v:'
-        let help = '<element>'
-      endif
-
-      " option refrence
-      if line =~ '&' . element . '\>'
-        let help = s:syntax_to_help['vimOption']
-      endif
-    endif
-
-    if help != ''
-      exec 'help ' . substitute(help, '<element>', element, '')
-      return
-    endif
   endif
 
   if type != ''
+    if element =~ '($'
+      let element = element[:-2]
+    endif
+
     let def = substitute(s:search[type . '_def'], '<element>', element, '')
 
     " on a definition, search for references

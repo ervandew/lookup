@@ -4,38 +4,29 @@
 Lookup                                           *lookup*
 
   Overview                           |lookup-overview|
-  Prerequisites                      |lookup-prerequisites|
   Usage                              |lookup-usage|
   Configuration                      |lookup-configuration|
 
 -----------------------------------------------------------------------------
 Overview                                         *lookup-overview*
 
-Lookup is a vim plugin for vim script developers which allows you to quickly
-find command/function/variable definitions/references or lookup vim docs for
-the element under the cursor.
-
------------------------------------------------------------------------------
-Prerequisites                                    *lookup-prerequisites*
-
-Lookup is only enabled for files of file type 'vim' and requires that you have
-file type plugins enabled (|:filetype-plugin-on|), as well as syntax
-highlighting turned on (|:syntax-enable|).
+Lookup is a plugin for vim/nvim plugin developers which allows you to quickly
+find command/function/variable definitions/references or lookup vim/nvim docs
+for the element under the cursor.
 
 -----------------------------------------------------------------------------
 Usage                                            *lookup-usage* *:Lookup*
 
 To use Lookup, simply place the cursor on the element you want to find and
-run the :Lookup command.  If you are on the name of a command, function, or
-variable definition then Lookup will find all the references and populate the
-quickfix list with the results.  If you are on a reference of a command,
-function, or variable, then Lookup will find the definition(s). If you are on
-a vim builtin command, variable, expression, etc. then in most cases Lookup
-will open the help topic for that element.
+run the :Lookup command.  First it will attempt to find help information and
+open that if found. Otherwise, if you are on the name of a command, function,
+or variable definition then Lookup will attempt find all the references and
+populate the quickfix list with the results. If you are on a reference of a
+command, function, or variable, then Lookup will find the definition(s).
 
-Note: Lookup relies on vim syntax highlighting to help determine context and
-the type of element to lookup, so some lookups won't return any results if
-syntax is disabled.
+NOTE:
+   Lookup of user defined functions, commands, and variables is limited to
+   vimscript. Lua support can be found via a lua lsp.
 
 The process of locating results for your :Lookup request involves:
 1. Determining the context of the element under the cursor and building an
@@ -60,6 +51,17 @@ surrounding if statement prevents <cr> from being mapped when in vim's
   if bufname('%') !~ '^\(command-line\|\[Command Line\]\)$'
     nnoremap <silent> <buffer> <cr> :Lookup<cr>
   endif
+>
+
+Alternatively, you can also add a mapping inside of your lazy.nvim
+configuration using an autocmd >
+
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'lua', 'vim' },
+    callback = function()
+      vim.keymap.set('n', '<cr>', ':Lookup<cr>', { buffer = true, silent = true })
+    end
+  })
 >
 
 The :Lookup command can also be invoked with an argument which can be either a

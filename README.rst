@@ -1,4 +1,4 @@
-.. Copyright (c) 2010 - 2011, Eric Van Dewoestine
+.. Copyright (c) 2010 - 2024, Eric Van Dewoestine
    All rights reserved.
 
    Redistribution and use of this software in source and binary forms, with
@@ -31,25 +31,47 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Lookup is a plugin for vim script developers which provides functionality to
-quickly and easily lookup docs for vim elements, or in the case of user defined
-functions, commands, or variables, find the definition or occurrences of the
-element.
+Lookup is a plugin for vim/nvim plugin developers which provides functionality
+to quickly and easily lookup docs for vim/nvim elements, or in the case of user
+defined functions, commands, or variables, find the definition or occurrences of
+the element.
 
-While editing a vim file, you can lookup the element under the cursor using:
+.. note::
+
+   Lookup of user defined functions, commands, and variables is limited to
+   vimscript. Lua support can be found via a lua lsp.
+
+While editing a vim or lua file (or viewing a vim/nvim help file), you can
+lookup the element under the cursor using:
 
 ::
 
     :Lookup
 
 You can also map this command so that you simply need to hit <cr> on an element
-to look it up by adding the following to a ftplugin/vim_lookup.vim file in your
+to look it up by adding the following to a ftplugin/vim.vim file in your
 vimfiles directory (%HOME%/vimfiles on Windows, ~/.vim on Linux/OSX):
 
-::
+.. code-block:: vim
 
   if bufname('%') !~ '^\(command-line\|\[Command Line\]\)$'
     nnoremap <silent> <buffer> <cr> :Lookup<cr>
   endif
+
+Or like so when using lazy.nvim:
+
+.. code-block:: lua
+
+  {
+    'ervandew/lookup',
+    config = function()
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'help', 'lua', 'vim' },
+        callback = function()
+          vim.keymap.set('n', '<cr>', ':Lookup<cr>', { buffer = true, silent = true })
+        end
+      })
+    end
+  }
 
 For more details please see the lookup vim docs (:help lookup).

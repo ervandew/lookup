@@ -1,4 +1,5 @@
 *.swp
 *.vmb
+README.html
 tags
 /build
