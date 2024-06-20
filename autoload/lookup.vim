@@ -82,12 +82,19 @@ function! lookup#Lookup(bang, element) " {{{
   let line = getline('.')
   if element == ''
     if &ft == 'help'
-      let synid = synID(line('.'), col('.'), 1)
-      if has('nvim') && synid == 0
+      let ts = v:false
+      if has('nvim')
+        let ts = luaeval(
+          \ 'vim.treesitter.highlighter.active[' . bufnr() . '] ~= nil'
+        \ )
+      endif
+
+      if has('nvim') && ts == v:true
         let link = luaeval(
           \ 'vim.treesitter.get_node():parent():type()'
         \ ) == 'taglink'
       else
+        let synid = synID(line('.'), col('.'), 1)
         let link = synIDattr(synid, "name") == 'helpHyperTextJump'
       endif
 
@@ -110,11 +117,14 @@ function! lookup#Lookup(bang, element) " {{{
     endif
   endif
 
-  if element =~ '^&' " option reference
+   " option reference
+  if element =~ '^&'
     let element = "'" . element[1:] . "'"
+  " vim global in lua
   elseif element =~ '^vim\.g\.'
     let element = substitute(element, 'vim\.g\.', 'g:', '')
-  elseif element =~ '^vim.[bgw]\?o\(pt\)\?\(_local\|_global\)\?\.' " option reference (in lua)
+  " option reference (in lua)
+  elseif element =~ '^vim.[bgw]\?o\(pt\)\?\(_local\|_global\)\?\.'
     let element = substitute(element, '.*\.', '', '')
     let element = substitute(element, ':.*', '', '')
     let element = "'" . element . "'"
