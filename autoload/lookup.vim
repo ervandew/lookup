@@ -141,7 +141,7 @@ function! lookup#Lookup(bang, element) " {{{
 
   if len(help_entries)
     exec 'help ' . element
-    return
+    return v:true
   endif
 
   let type = ''
@@ -187,13 +187,13 @@ function! lookup#Lookup(bang, element) " {{{
 
     " on a definition, search for references
     if line =~ def
-      call s:Find(element, a:bang, type . '_ref')
+      return s:Find(element, a:bang, type . '_ref')
+    endif
 
     " on a reference, search for definition.
-    else
-      call s:Find(element, a:bang, type . '_def')
-    endif
+    return s:Find(element, a:bang, type . '_def')
   endif
+  return v:false
 endfunction " }}}
 
 function! s:Find(element, bang, context) " {{{
@@ -240,47 +240,42 @@ function! s:Find(element, bang, context) " {{{
   let qflist = getqflist()
   if len(qflist) == 0
     echoh WarningMsg | echo "No results found for '" . element . "'." | echoh Normal
-  else
-    if a:bang != ''
-      copen
-    elseif len(qflist) == 1
-      if g:LookupSingleResultAction == 'edit'
-        cfirst
-        if foldclosed(line('.')) != -1
-          foldopen!
-        endif
-      elseif g:LookupSingleResultAction == 'split'
-        let file = bufname(qflist[0].bufnr)
-        if file != expand('%')
-          let winnr = bufwinnr(bufnr('^' . file))
-          if winnr != -1
-            exec winnr . 'winc w'
-          else
-            silent exec 'split ' . escape(file, ' ')
-          endif
-        endif
-        call cursor(qflist[0].lnum, qflist[0].col)
-        if foldclosed(line('.')) != -1
-          foldopen!
-        endif
-      else
-        copen
-      endif
-    else
+    return v:false
+  endif
+
+  if a:bang != ''
+    copen
+  elseif len(qflist) == 1
+    if g:LookupSingleResultAction == 'edit'
       cfirst
       if foldclosed(line('.')) != -1
         foldopen!
       endif
+    elseif g:LookupSingleResultAction == 'split'
+      let file = bufname(qflist[0].bufnr)
+      if file != expand('%')
+        let winnr = bufwinnr(bufnr('^' . file))
+        if winnr != -1
+          exec winnr . 'winc w'
+        else
+          silent exec 'split ' . escape(file, ' ')
+        endif
+      endif
+      call cursor(qflist[0].lnum, qflist[0].col)
+      if foldclosed(line('.')) != -1
+        foldopen!
+      endif
+    else
+      copen
     endif
-
-    if exists('g:EclimSignLevel')
-      for result in qflist
-        let result['type'] = 'i'
-      endfor
-      call setqflist(qflist)
-      call eclim#display#signs#Update()
+  else
+    cfirst
+    if foldclosed(line('.')) != -1
+      foldopen!
     endif
   endif
+
+  return v:true
 endfunction " }}}
 
 function! s:Paths() " {{{
