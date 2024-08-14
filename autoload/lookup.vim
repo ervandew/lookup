@@ -101,10 +101,10 @@ function! lookup#Lookup(bang, element) " {{{
       if link
         let element = substitute(
           \ line,
-          \ '.\{-}|\(.\{-}\%' . col('.') . 'c.\{-}\)|.*',
+          \ '.*|\(.\{-}\%' . col('.') . 'c.\{-}\)|.*',
           \ '\1',
           \ ''
-        \)
+        \ )
         if element == line
           let element = ''
         endif
